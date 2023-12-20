@@ -1,28 +1,118 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { Button, TextInput, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { TailwindProvider } from "tailwindcss-react-native";
 import tw from "twrnc";
+import CustomInput from "./components/CustomInput/CustomInput";
 import Logo from "./img/logo";
 
-type FormData = {
-  username: string;
+// Defining form data type
+export type FormData = {
+  email: string;
   password: string;
 };
 
+// Validating email based on most common email regex
+const emailValidation = {
+  value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+  message: "Please enter a valid email address",
+};
+
 const App: React.FC = () => {
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+  const [failedLogin, setFailedLogin] = React.useState<boolean>(false);
+  const [successLogin, setSuccessLogin] = React.useState<boolean>(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+
+  useEffect(() => {
+    if (failedLogin || successLogin) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 0,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, [successLogin, failedLogin, pulseAnim]);
+
+  const onSubmit = (data: FormData) => {
+    if (data.email === "angela@10zyme.com" && data.password === "123456") {
+      setSuccessLogin(true);
+      setTimeout(() => {
+        setSuccessLogin(false);
+      }, 3000);
+    } else {
+      setFailedLogin(true);
+      setTimeout(() => {
+        setFailedLogin(false);
+      }, 3000);
+    }
+  };
+
   return (
     <TailwindProvider>
       <StatusBar style="auto" />
-      <View style={tw`flex-1 items-center justify-center`}>
+      <View style={tw`flex-1 items-center justify-center p-14`}>
+        <Logo />
+
+        <CustomInput
+          name="email"
+          control={control}
+          rules={{ required: "Email is required", pattern: emailValidation }}
+          placeholder={"Email"}
+          secureTextEntry={false}
+        />
+
+        <CustomInput
+          name="password"
+          control={control}
+          rules={{
+            required: "Password is required",
+            minLength: {
+              value: 6,
+              message: "Password must be at least 6 characters",
+            },
+          }}
+          placeholder={"Password"}
+          secureTextEntry={true}
+        />
+
+        <TouchableOpacity onPress={handleSubmit(onSubmit)}>
+          <View style={tw`bg-blue-500 py-2 px-4 rounded`}>
+            <Text style={tw`text-white text-center`}>Login</Text>
+          </View>
+        </TouchableOpacity>
         <View>
-          <Logo />
+          {failedLogin && (
+            <Animated.Text
+              style={{ opacity: pulseAnim, color: "red", marginTop: 10 }}
+            >
+              We couldn't find any user with that email and password
+              combination.
+            </Animated.Text>
+          )}
+          {successLogin && (
+            <Animated.Text
+              style={{ opacity: pulseAnim, color: "green", marginTop: 10 }}
+            >
+              Login successful!
+            </Animated.Text>
+          )}
         </View>
-        <View>
-          <TextInput placeholder="Username" />
-          <TextInput placeholder="Password" />
-        </View>
-        <Button title="Login" />
       </View>
     </TailwindProvider>
   );
