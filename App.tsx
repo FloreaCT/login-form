@@ -1,4 +1,5 @@
 import Checkbox from "expo-checkbox";
+import * as SecureStore from "expo-secure-store";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -25,6 +26,7 @@ const App: React.FC = () => {
   const [failedLogin, setFailedLogin] = React.useState<boolean>(false);
   const [successLogin, setSuccessLogin] = React.useState<boolean>(false);
   const [toggleCheckBox, setToggleCheckBox] = React.useState<boolean>(false);
+  const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
 
   const {
     control,
@@ -32,6 +34,23 @@ const App: React.FC = () => {
     formState: { errors },
   } = useForm<FormData>();
 
+  // Checking if there is a user session stored in the device
+  // In production this would push the user to the dashboard
+  useEffect(() => {
+    const getUserSession = async () => {
+      try {
+        const userSession = await SecureStore.getItemAsync("user_session");
+        if (userSession) {
+          setLoggedIn(true);
+        }
+      } catch (error) {
+        console.log("There was an error while retrieving the user session");
+      }
+    };
+    getUserSession();
+  }, []);
+
+  // Animating the error message
   useEffect(() => {
     if (failedLogin || successLogin) {
       Animated.loop(
@@ -51,9 +70,30 @@ const App: React.FC = () => {
     }
   }, [successLogin, failedLogin, pulseAnim]);
 
-  const onSubmit = (data: FormData) => {
+  // Deleting the user session
+  // In production this would push the user to the login screen
+  const onLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync("user_session");
+      setLoggedIn(false);
+    } catch (error) {
+      console.log("There was an error while deleting the user session");
+    }
+  };
+
+  const onSubmit = async (data: FormData) => {
+    // Simulating a login request
     if (data.email === "cristian@10zyme.com" && data.password === "123456") {
-      // Simulating a login request
+      if (toggleCheckBox) {
+        try {
+          await SecureStore.setItemAsync("user_session", JSON.stringify(data));
+          setLoggedIn(true);
+        } catch (error) {
+          console.log("There was an error while storing the user session");
+        }
+      } else {
+        setLoggedIn(true);
+      }
       setSuccessLogin(true);
       setTimeout(() => {
         setSuccessLogin(false);
@@ -93,21 +133,34 @@ const App: React.FC = () => {
           placeholder={"Password"}
           secureTextEntry={true}
         />
-        <View style={tw`flex-row self-stretch items-center mb-2`}>
-          <Checkbox
-            disabled={false}
-            value={toggleCheckBox}
-            onValueChange={(newValue) => setToggleCheckBox(newValue)}
-            color={toggleCheckBox ? "#129A9E" : "#8e918f"}
-          />
-          <Text style={tw`ml-2`}>Remember Me</Text>
-        </View>
 
+        <TouchableOpacity
+          style={tw`flex-row self-stretch items-center mb-2`}
+          onPress={() => setToggleCheckBox(!toggleCheckBox)}
+          activeOpacity={0.7}
+        >
+          <View style={tw`flex-row self-stretch items-center mb-2`}>
+            <Checkbox
+              disabled={false}
+              value={toggleCheckBox}
+              onValueChange={(newValue) => setToggleCheckBox(newValue)}
+              color={toggleCheckBox ? "#129A9E" : "#8e918f"}
+            />
+            <Text style={tw`ml-2`}>Remember Me</Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleSubmit(onSubmit)}>
           <View style={tw`bg-[#129A9E] py-2 px-4 rounded`}>
             <Text style={tw`text-white text-center`}>Login</Text>
           </View>
         </TouchableOpacity>
+        {loggedIn && (
+          <TouchableOpacity onPress={() => onLogout()}>
+            <View style={tw`bg-[#129A9E] py-2 px-4 rounded mt-2`}>
+              <Text style={tw`text-white text-center`}>Logout</Text>
+            </View>
+          </TouchableOpacity>
+        )}
         <View>
           {failedLogin && (
             <Animated.Text
