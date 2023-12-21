@@ -30,6 +30,9 @@ To start the project, you can use the following command:
 npm start
 ```
 
+Test Email: cristian@10zyme.com
+Test Password: 123456
+
 This will start the project in development mode. You can open it in the Expo app on your phone to view it.
 
 ## Contributing
