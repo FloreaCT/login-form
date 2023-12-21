@@ -3,7 +3,7 @@ import { Control, Controller, RegisterOptions } from "react-hook-form";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import tw from "twrnc";
-import { FormData } from "../../App";
+import { FormData } from "../../screens/Login/Login";
 
 // Defining data type for the custom inputs
 interface CustomInputProps {
@@ -23,6 +23,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 }) => {
   // Creating a reference for the input to focus on it when the user clicks anywhere on the input field
   const inputRef = useRef<TextInput>(null);
+
   // Defining icon properties
   const iconName = name === "email" ? "envelope" : "lock";
   const iconSize = 20;

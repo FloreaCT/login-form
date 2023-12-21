@@ -4,7 +4,7 @@
     "slug": "login-form",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/favicon.ico",
+    "icon": "./assets/icons/favicon.ico",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "",
@@ -22,7 +22,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.ico"
+      "favicon": "./assets/icons/favicon.ico"
     }
   }
 }
