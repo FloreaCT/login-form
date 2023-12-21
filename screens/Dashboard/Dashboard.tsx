@@ -18,6 +18,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = () => {
   const route = useRoute();
 
   useEffect(() => {
+    // Checking if the user was redirected from the login screen
     if ((route.params as { user: string })?.user) {
       const userData = JSON.parse(
         (route.params as { user: string })?.user ?? ""

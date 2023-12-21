@@ -75,7 +75,9 @@ const Login: React.FC = () => {
   }, [failedLogin, pulseAnim]);
 
   const onSubmit = async (data: FormData) => {
+    // Simulating data fetching from an API
     if (data.email === "cristian@10zyme.com" && data.password === "123456") {
+      // Storing user session in the device
       if (toggleCheckBox) {
         try {
           await SecureStore.setItemAsync("user_session", JSON.stringify(data));
