@@ -1,3 +1,4 @@
+import Checkbox from "expo-checkbox";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ const App: React.FC = () => {
   const pulseAnim = useRef(new Animated.Value(0)).current;
   const [failedLogin, setFailedLogin] = React.useState<boolean>(false);
   const [successLogin, setSuccessLogin] = React.useState<boolean>(false);
+  const [toggleCheckBox, setToggleCheckBox] = React.useState<boolean>(false);
 
   const {
     control,
@@ -50,7 +52,8 @@ const App: React.FC = () => {
   }, [successLogin, failedLogin, pulseAnim]);
 
   const onSubmit = (data: FormData) => {
-    if (data.email === "angela@10zyme.com" && data.password === "123456") {
+    if (data.email === "cristian@10zyme.com" && data.password === "123456") {
+      // Simulating a login request
       setSuccessLogin(true);
       setTimeout(() => {
         setSuccessLogin(false);
@@ -90,9 +93,18 @@ const App: React.FC = () => {
           placeholder={"Password"}
           secureTextEntry={true}
         />
+        <View style={tw`flex-row self-stretch items-center mb-2`}>
+          <Checkbox
+            disabled={false}
+            value={toggleCheckBox}
+            onValueChange={(newValue) => setToggleCheckBox(newValue)}
+            color={toggleCheckBox ? "#129A9E" : "#8e918f"}
+          />
+          <Text style={tw`ml-2`}>Remember Me</Text>
+        </View>
 
         <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-          <View style={tw`bg-blue-500 py-2 px-4 rounded`}>
+          <View style={tw`bg-[#129A9E] py-2 px-4 rounded`}>
             <Text style={tw`text-white text-center`}>Login</Text>
           </View>
         </TouchableOpacity>
